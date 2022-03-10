@@ -14,8 +14,8 @@ export default function Navbar() {
 
     const contract = useGetVibeContract();
     const dai = useDepositTokenContract();
-    const [isReceiver, setIsReceiver] = useState<boolean>(false);
-    const [isPaused, setIsPaused] = useState<boolean>(false);
+    const [isReceiver, setIsReceiver] = useState<boolean>();
+    const [acceptsDeposits, setacceptsDeposits] = useState<boolean>();
     const [depBal, setDepBal] = useState<number>(0);
     const [withdrawBal, setWithdrawBal] = useState<number>(0);
     const [depInput, setDepInput] = useState<number>(0);
@@ -29,7 +29,7 @@ export default function Navbar() {
             setIsReceiver(receiver[1]);
             setDepBal(depositInfo / 1e18);
             if (isReceiver) {
-                setIsPaused(receiver[2]);
+                setacceptsDeposits(receiver[2]);
                 setWithdrawBal(receiver[0] / 1e18);
             }
         }
@@ -77,7 +77,7 @@ export default function Navbar() {
                         </ModalHeader>
                         <ModalBody marginBottom="20px">
                             <HStack>
-                            <NumberInput width="100%" onChange={(i) => setDepInput(parseInt(i))}>
+                            <NumberInput width="100%" onChange={(i) => setDepInput(parseFloat(i))}>
                                 <NumberInputField/>
                             </NumberInput>
                             <Spacer/>
@@ -92,7 +92,7 @@ export default function Navbar() {
                     </ModalContent>
                 </Modal>
                 <Box width="100px" textAlign="center" fontSize="18px" fontWeight="bold">
-                    {depBal.toString()} DAI
+                    {depBal.toFixed(2)} DAI
                 </Box>
                 {isReceiver ? <Button fontSize="18px" onClick={withOnOpen}>
                     Withdraw
@@ -120,10 +120,10 @@ export default function Navbar() {
                     </ModalContent>
                 </Modal>
                 {isReceiver ? <Box width="100px" textAlign="center" fontSize="18px" fontWeight="bold">
-                    {withdrawBal.toString()} DAI
+                    {withdrawBal.toFixed(2)} DAI
                 </Box> : ""}
                 {isReceiver ? <Button onClick={toggleDep} fontSize="18px">
-                    {isPaused ? "Start" : "Stop"}
+                    {acceptsDeposits ? "Stop" : "Start"}
                 </Button> : ""}
                 {isReceiver ? "" : <Button onClick={beReceiver} fontSize="18px">
                     Become Receiver

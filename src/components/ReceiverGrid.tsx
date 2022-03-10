@@ -1,10 +1,13 @@
 import { Flex, SimpleGrid, Box, Text, NumberInput, NumberInputField, Heading, Button, HStack } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import BigNumber from "bignumber.js";
+import { useCallback, useEffect, useState } from "react";
 import useGetVibeContract from "./GetVibeContract";
 
 export default function ReceiverGrid() {
 
     const [receivers, setReceivers] = useState<{ address: string, timeLeft: number }[]>([])
+    const [transInput, setTransInput] = useState<number>(0);
+    const [selectedAdd, setSelectedAdd] = useState<string>("");
 
     const contract = useGetVibeContract();
 
@@ -21,6 +24,7 @@ export default function ReceiverGrid() {
             }
             setReceivers(receiverResult)
         }
+
         getReceivers()
 
         const interval = setInterval(() => {
@@ -29,6 +33,16 @@ export default function ReceiverGrid() {
 
         return () => clearInterval(interval);
     })
+
+    const handleTransfer = (address:string) => {
+        setSelectedAdd(address)
+        transferToken()
+    }
+
+    const transferToken = useCallback(() => {
+        const value = new BigNumber(transInput).times(1e18).toFixed(0);
+        contract.transferToReceiver(selectedAdd, value);
+    }, [contract, transInput, selectedAdd])
 
     return (
         <Flex padding="15px">
@@ -48,10 +62,10 @@ export default function ReceiverGrid() {
                             Yes
                         </Text>
                         <HStack marginTop="30px">
-                            <NumberInput>
-                                <NumberInputField bg="blue.600" />
+                            <NumberInput onChange={(i) => setTransInput(parseFloat(i))}>
+                                <NumberInputField bg="blue.600"/>
                             </NumberInput>
-                            <Button>
+                            <Button onClick={() => handleTransfer(p.address)}>
                                 Transfer
                             </Button>
                         </HStack>
