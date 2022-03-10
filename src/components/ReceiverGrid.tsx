@@ -1,21 +1,19 @@
 import { Flex, SimpleGrid, Box, Text, NumberInput, NumberInputField, Heading, Button, HStack } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import useGetContract from "./GetContract";
+import useGetVibeContract from "./GetVibeContract";
 
 export default function ReceiverGrid() {
 
     const [receivers, setReceivers] = useState<{ address: string, timeLeft: number }[]>([])
 
-    const contract = useGetContract();
+    const contract = useGetVibeContract();
 
     useEffect(() => {
         async function getReceivers() {
-
-            let receiverResult = [];
-            const allAddresses = await contract.receiverAddresses();
-            const getReceivers = await contract.getAllReceivers();
+            let receiverResult:{address: string, timeLeft: number}[] = [];
+            const allAddresses:string[] = await contract.receiverAddresses();
             for (let i = 0; i < allAddresses.length; i++) {
-                const address = allAddresses[i];
+                const address:string = allAddresses[i];
                 receiverResult.push({
                     address: address,
                     timeLeft: 0
@@ -32,26 +30,24 @@ export default function ReceiverGrid() {
         return () => clearInterval(interval);
     })
 
-
-
     return (
         <Flex padding="15px">
-            <SimpleGrid columns={5}>
+            <SimpleGrid columns={5} spacing={20}>
                 {receivers ? receivers.map((p) => (
-                    <Box height="180px" width="350px" bg="blue.500" borderRadius="10px" padding="10px">
+                    <Box height="200px" width="350px" bg="blue.500" borderRadius="10px" padding="10px">
                         <Heading fontSize="20px">
                             Address:
                         </Heading>
-                        <Text fontSize="14px" marginLeft="5px">
+                        <Text fontSize="14px" marginLeft="5px" marginBottom="5px">
                             {p.address}
                         </Text>
                         <Heading fontSize="20px">
                             Vibration Time:
                         </Heading>
-                        <Text fontSize="18px" marginLeft="5px">
+                        <Text fontSize="18px" marginLeft="5px" marginBottom="5px">
                             Yes
                         </Text>
-                        <HStack marginTop="20px">
+                        <HStack marginTop="30px">
                             <NumberInput>
                                 <NumberInputField bg="blue.600" />
                             </NumberInput>
