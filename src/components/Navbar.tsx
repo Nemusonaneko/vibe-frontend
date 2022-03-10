@@ -16,6 +16,8 @@ export default function Navbar() {
     const dai = useDepositTokenContract();
     const [isReceiver, setIsReceiver] = useState<boolean>();
     const [acceptsDeposits, setacceptsDeposits] = useState<boolean>();
+    const [enoughAllowance, setEnoughAllowance] = useState<boolean>();
+    const [allowanceVal, setAllowanceVal] = useState<number>(0);
     const [depBal, setDepBal] = useState<number>(0);
     const [withdrawBal, setWithdrawBal] = useState<number>(0);
     const [depInput, setDepInput] = useState<number>(0);
@@ -26,6 +28,8 @@ export default function Navbar() {
             const address: string = await contract.signer._address;
             const depositInfo = await contract.depositors(address);
             const receiver = await contract.receivers(address);
+            const allowance = await dai.allowance(address, contract.address);
+            setAllowanceVal(allowance);
             setIsReceiver(receiver[1]);
             setDepBal(depositInfo / 1e18);
             if (isReceiver) {
@@ -34,10 +38,6 @@ export default function Navbar() {
             }
         }
         update()
-        const interval = setInterval(() => {
-            update()
-        }, 1000);
-        return () => clearInterval(interval);
     })
 
     const beReceiver = useCallback(() => {
@@ -48,11 +48,15 @@ export default function Navbar() {
         contract.toggleAcceptDeposits()
     }, [contract])
 
-    const depositDai = useCallback(() => {
+    const approveDai = useCallback(() => {
         const value = new BigNumber(depInput).times(1e18).toFixed(0);
         dai.approve("0x5daF92FB6587866bA91F14cE397EDc0a5Ee34507", value);
+    }, [dai, depInput])
+
+    const depositDai = useCallback(() => {
+        const value = new BigNumber(depInput).times(1e18).toFixed(0);
         contract.deposit(value)
-    }, [contract, depInput, dai])
+    }, [contract, depInput])
 
     const withdrawDai = useCallback(() => {
         const value = new BigNumber(withInput).times(1e18).toFixed(0);
@@ -77,16 +81,24 @@ export default function Navbar() {
                         </ModalHeader>
                         <ModalBody marginBottom="20px">
                             <HStack>
-                            <NumberInput width="100%" onChange={(i) => setDepInput(parseFloat(i))}>
-                                <NumberInputField/>
-                            </NumberInput>
-                            <Spacer/>
-                            <Button onClick={depositDai}>
-                                Deposit
-                            </Button>
-                            <Button onClick={depOnClose}>
-                                Close
-                            </Button>
+                                <NumberInput width="100%" onChange={(i) => {
+                                    setDepInput(parseFloat(i)); if (parseInt(i) * 1e18 > allowanceVal) {
+                                        setEnoughAllowance(false)
+                                    } else {
+                                        setEnoughAllowance(true)
+                                    }
+                                }}>
+                                    <NumberInputField />
+                                </NumberInput>
+                                <Spacer />
+                                {enoughAllowance ? <Button onClick={depositDai}>
+                                    Deposit
+                                </Button> : <Button onClick={approveDai}>
+                                    Approve
+                                </Button>}
+                                <Button onClick={depOnClose}>
+                                    Close
+                                </Button>
                             </HStack>
                         </ModalBody>
                     </ModalContent>
@@ -105,16 +117,16 @@ export default function Navbar() {
                         </ModalHeader>
                         <ModalBody marginBottom="20px">
                             <HStack>
-                            <NumberInput width="100%" onChange={(i) => setWithInput(parseInt(i))}>
-                                <NumberInputField/>
-                            </NumberInput>
-                            <Spacer/>
-                            <Button onClick={withdrawDai}>
-                                Withdraw
-                            </Button>
-                            <Button onClick={withOnClose}>
-                                Close
-                            </Button>
+                                <NumberInput width="100%" onChange={(i) => setWithInput(parseInt(i))}>
+                                    <NumberInputField />
+                                </NumberInput>
+                                <Spacer />
+                                <Button onClick={withdrawDai}>
+                                    Withdraw
+                                </Button>
+                                <Button onClick={withOnClose}>
+                                    Close
+                                </Button>
                             </HStack>
                         </ModalBody>
                     </ModalContent>

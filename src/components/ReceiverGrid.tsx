@@ -13,10 +13,10 @@ export default function ReceiverGrid() {
 
     useEffect(() => {
         async function getReceivers() {
-            let receiverResult:{address: string, timeLeft: number}[] = [];
-            const allAddresses:string[] = await contract.receiverAddresses();
+            let receiverResult: { address: string, timeLeft: number }[] = [];
+            const allAddresses: string[] = await contract.receiverAddresses();
             for (let i = 0; i < allAddresses.length; i++) {
-                const address:string = allAddresses[i];
+                const address: string = allAddresses[i];
                 receiverResult.push({
                     address: address,
                     timeLeft: 0
@@ -26,15 +26,9 @@ export default function ReceiverGrid() {
         }
 
         getReceivers()
-
-        const interval = setInterval(() => {
-            getReceivers()
-        }, 1000);
-
-        return () => clearInterval(interval);
     })
 
-    const handleTransfer = (address:string) => {
+    const handleTransfer = (address: string) => {
         setSelectedAdd(address)
         transferToken()
     }
@@ -63,7 +57,7 @@ export default function ReceiverGrid() {
                         </Text>
                         <HStack marginTop="30px">
                             <NumberInput onChange={(i) => setTransInput(parseFloat(i))}>
-                                <NumberInputField bg="blue.600"/>
+                                <NumberInputField bg="blue.600" />
                             </NumberInput>
                             <Button onClick={() => handleTransfer(p.address)}>
                                 Transfer
