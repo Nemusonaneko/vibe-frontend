@@ -50,7 +50,7 @@ export default function ReceiverGrid() {
                             {p.address}
                         </Text>
                         <Heading fontSize="20px">
-                            Vibration Time:
+                            Time:
                         </Heading>
                         <Text fontSize="18px" marginLeft="5px" marginBottom="5px">
                             Yes
