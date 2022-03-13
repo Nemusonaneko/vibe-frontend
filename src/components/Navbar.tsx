@@ -64,7 +64,7 @@ export default function Navbar() {
     }, [contract, withInput])
 
     return (
-        <Flex w="100%" h="50px" bg="pink.600">
+        <Flex w="100%" h="50px" bg="#457b9d">
             <HStack padding="5px" w="100%">
                 <Flex w="200px" fontWeight="bold" fontSize="28px">
                     Let's Vibe UwU

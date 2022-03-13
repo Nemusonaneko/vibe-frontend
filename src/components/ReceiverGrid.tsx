@@ -15,8 +15,11 @@ export default function ReceiverGrid() {
         async function getReceivers() {
             let receiverResult: { address: string, timeLeft: number }[] = [];
             const allAddresses: string[] = await contract.receiverAddresses();
+            const allReceivers = await contract.getAllReceivers();
             for (let i = 0; i < allAddresses.length; i++) {
                 const address: string = allAddresses[i];
+                const receiver = allReceivers[i];
+                if (!receiver[2]) continue;
                 receiverResult.push({
                     address: address,
                     timeLeft: 0
