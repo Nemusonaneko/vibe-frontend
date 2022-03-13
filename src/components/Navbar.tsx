@@ -1,35 +1,26 @@
-import { Flex, Button, HStack, Text, Spacer, Box, useDisclosure, Modal, ModalOverlay, ModalContent, ModalBody, ModalHeader, NumberInput, NumberInputField } from "@chakra-ui/react";
+import { Flex, Button, HStack, Spacer, Box } from "@chakra-ui/react";
 import { useCallback, useEffect, useState } from "react";
 import { useConnect, useAccount } from "wagmi";
-import BigNumber from "bignumber.js";
 import useGetVibeContract from "./GetVibeContract";
-import useDepositTokenContract from "./DepositTokenContract";
+import DepositModal from "./DepositModal";
+import WithdrawModal from "./WithdrawModal";
 
 export default function Navbar() {
 
     const [{ data: connectData }, connect] = useConnect()
     const [{ data: accountData }, disconnect] = useAccount()
-    const { isOpen: depIsOpen, onOpen: depOnOpen, onClose: depOnClose } = useDisclosure();
-    const { isOpen: withIsOpen, onOpen: withOnOpen, onClose: withOnClose } = useDisclosure();
 
     const contract = useGetVibeContract();
-    const dai = useDepositTokenContract();
     const [isReceiver, setIsReceiver] = useState<boolean>();
     const [acceptsDeposits, setacceptsDeposits] = useState<boolean>();
-    const [enoughAllowance, setEnoughAllowance] = useState<boolean>();
-    const [allowanceVal, setAllowanceVal] = useState<number>(0);
     const [depBal, setDepBal] = useState<number>(0);
     const [withdrawBal, setWithdrawBal] = useState<number>(0);
-    const [depInput, setDepInput] = useState<number>(0);
-    const [withInput, setWithInput] = useState<number>(0);
 
     useEffect(() => {
         async function update() {
             const address: string = await contract.signer._address;
             const depositInfo = await contract.depositors(address);
             const receiver = await contract.receivers(address);
-            const allowance = await dai.allowance(address, contract.address);
-            setAllowanceVal(allowance);
             setIsReceiver(receiver[1]);
             setDepBal(depositInfo / 1e18);
             if (isReceiver) {
@@ -48,21 +39,6 @@ export default function Navbar() {
         contract.toggleAcceptDeposits()
     }, [contract])
 
-    const approveDai = useCallback(() => {
-        const value = new BigNumber(depInput).times(1e18).toFixed(0);
-        dai.approve("0x5daF92FB6587866bA91F14cE397EDc0a5Ee34507", value);
-    }, [dai, depInput])
-
-    const depositDai = useCallback(() => {
-        const value = new BigNumber(depInput).times(1e18).toFixed(0);
-        contract.deposit(value)
-    }, [contract, depInput])
-
-    const withdrawDai = useCallback(() => {
-        const value = new BigNumber(withInput).times(1e18).toFixed(0);
-        contract.withdraw(value)
-    }, [contract, withInput])
-
     return (
         <Flex w="100%" h="50px" bg="#457b9d">
             <HStack padding="5px" w="100%">
@@ -70,67 +46,11 @@ export default function Navbar() {
                     Let's Vibe UwU
                 </Flex>
                 <Spacer />
-                <Button fontSize="18px" onClick={depOnOpen}>
-                    Deposit
-                </Button>
-                <Modal isOpen={depIsOpen} onClose={depOnClose}>
-                    <ModalOverlay />
-                    <ModalContent>
-                        <ModalHeader fontWeight="bold" fontSize="30px">
-                            Deposit DAI
-                        </ModalHeader>
-                        <ModalBody marginBottom="20px">
-                            <HStack>
-                                <NumberInput width="100%" onChange={(i) => {
-                                    setDepInput(parseFloat(i)); if (parseInt(i) * 1e18 > allowanceVal) {
-                                        setEnoughAllowance(false)
-                                    } else {
-                                        setEnoughAllowance(true)
-                                    }
-                                }}>
-                                    <NumberInputField />
-                                </NumberInput>
-                                <Spacer />
-                                {enoughAllowance ? <Button onClick={depositDai}>
-                                    Deposit
-                                </Button> : <Button onClick={approveDai}>
-                                    Approve
-                                </Button>}
-                                <Button onClick={depOnClose}>
-                                    Close
-                                </Button>
-                            </HStack>
-                        </ModalBody>
-                    </ModalContent>
-                </Modal>
+                <DepositModal />
                 <Box width="100px" textAlign="center" fontSize="18px" fontWeight="bold">
                     {depBal.toFixed(2)} DAI
                 </Box>
-                {isReceiver ? <Button fontSize="18px" onClick={withOnOpen}>
-                    Withdraw
-                </Button> : ""}
-                <Modal isOpen={withIsOpen} onClose={withOnClose}>
-                    <ModalOverlay />
-                    <ModalContent>
-                        <ModalHeader fontWeight="bold" fontSize="30px">
-                            Withdraw DAI
-                        </ModalHeader>
-                        <ModalBody marginBottom="20px">
-                            <HStack>
-                                <NumberInput width="100%" onChange={(i) => setWithInput(parseInt(i))}>
-                                    <NumberInputField />
-                                </NumberInput>
-                                <Spacer />
-                                <Button onClick={withdrawDai}>
-                                    Withdraw
-                                </Button>
-                                <Button onClick={withOnClose}>
-                                    Close
-                                </Button>
-                            </HStack>
-                        </ModalBody>
-                    </ModalContent>
-                </Modal>
+                {isReceiver ? <WithdrawModal /> : ""}
                 {isReceiver ? <Box width="100px" textAlign="center" fontSize="18px" fontWeight="bold">
                     {withdrawBal.toFixed(2)} DAI
                 </Box> : ""}
