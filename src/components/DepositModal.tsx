@@ -18,13 +18,18 @@ export default function DepositModal() {
             const address: string = await contract.signer._address;
             const allowance = await dai.allowance(address, contract.address);
             setAllowanceVal(allowance);
+            if (Number(depInput) * 1e18 > allowanceVal) {
+                setEnoughAllowance(false)
+            } else {
+                setEnoughAllowance(true)
+            }
         }
         update()
     })
 
     const approveDai = useCallback(() => {
         const value = new BigNumber(depInput).times(1e18).toFixed(0);
-        dai.approve("0x5daF92FB6587866bA91F14cE397EDc0a5Ee34507", value);
+        dai.approve("0xF19b4ef092c7164C5CBD6104bE3cbfF09C85Bc1F", value);
     }, [dai, depInput])
 
     const depositDai = useCallback(() => {
@@ -46,11 +51,7 @@ export default function DepositModal() {
                     <ModalBody marginBottom="20px">
                         <HStack>
                             <NumberInput width="100%" onChange={(i) => {
-                                setDepInput(parseFloat(i)); if (parseInt(i) * 1e18 > allowanceVal) {
-                                    setEnoughAllowance(false)
-                                } else {
-                                    setEnoughAllowance(true)
-                                }
+                                setDepInput(Number(i));
                             }}>
                                 <NumberInputField />
                             </NumberInput>

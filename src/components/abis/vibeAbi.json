@@ -194,6 +194,11 @@
 						"internalType": "bool",
 						"name": "acceptDeposits",
 						"type": "bool"
+					},
+					{
+						"internalType": "uint256",
+						"name": "endTime",
+						"type": "uint256"
 					}
 				],
 				"internalType": "struct VibeDeposit.Receiver[]",
@@ -260,6 +265,11 @@
 				"internalType": "bool",
 				"name": "acceptDeposits",
 				"type": "bool"
+			},
+			{
+				"internalType": "uint256",
+				"name": "endTime",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",

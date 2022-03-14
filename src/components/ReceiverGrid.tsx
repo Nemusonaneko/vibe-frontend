@@ -5,24 +5,27 @@ import useGetVibeContract from "./GetVibeContract";
 
 export default function ReceiverGrid() {
 
-    const [receivers, setReceivers] = useState<{ address: string, timeLeft: number }[]>([])
+    const [receivers, setReceivers] = useState<{ address: string, timeEnd: number }[]>([])
     const [transInput, setTransInput] = useState<number>(0);
     const [selectedAdd, setSelectedAdd] = useState<string>("");
+    const [currentTime, setCurrentTime] = useState<number>(0);
 
     const contract = useGetVibeContract();
 
     useEffect(() => {
         async function getReceivers() {
-            let receiverResult: { address: string, timeLeft: number }[] = [];
+            let receiverResult: { address: string, timeEnd: number }[] = [];
             const allAddresses: string[] = await contract.receiverAddresses();
             const allReceivers = await contract.getAllReceivers();
+            const time = Date.now() / 100;
+            setCurrentTime(time);
             for (let i = 0; i < allAddresses.length; i++) {
                 const address: string = allAddresses[i];
                 const receiver = allReceivers[i];
                 if (!receiver[2]) continue;
                 receiverResult.push({
                     address: address,
-                    timeLeft: 0
+                    timeEnd: receiver[3]
                 });
             }
             setReceivers(receiverResult)
@@ -56,7 +59,7 @@ export default function ReceiverGrid() {
                             Time:
                         </Heading>
                         <Text fontSize="18px" marginLeft="5px" marginBottom="5px">
-                            Yes
+                            {currentTime - p.timeEnd > 0? currentTime - p.timeEnd: "0"}s
                         </Text>
                         <HStack marginTop="30px">
                             <NumberInput onChange={(i) => setTransInput(parseFloat(i))}>

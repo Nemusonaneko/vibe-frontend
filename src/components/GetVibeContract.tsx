@@ -6,7 +6,7 @@ export default function useGetVibeContract() {
     const [{data:signerData}] = useSigner();
 
     const contract = useContract({
-        addressOrName: "0x5daF92FB6587866bA91F14cE397EDc0a5Ee34507",
+        addressOrName: "0xF19b4ef092c7164C5CBD6104bE3cbfF09C85Bc1F",
         contractInterface: abi,
         signerOrProvider: signerData
     })

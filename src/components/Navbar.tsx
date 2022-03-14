@@ -4,6 +4,7 @@ import { useConnect, useAccount } from "wagmi";
 import useGetVibeContract from "./GetVibeContract";
 import DepositModal from "./DepositModal";
 import WithdrawModal from "./WithdrawModal";
+import ButtplugConnectButton from "./ButtplugConnectButton";
 
 export default function Navbar() {
 
@@ -60,6 +61,7 @@ export default function Navbar() {
                 {isReceiver ? "" : <Button onClick={beReceiver} fontSize="18px">
                     Become Receiver
                 </Button>}
+                <ButtplugConnectButton/>
                 <Button fontSize="18px" bg={accountData ? "red.600" : "green.600"} onClick={accountData ? disconnect : () => connect(connectData.connectors[0])}>
                     {accountData ? accountData.address.substring(0, 5) + "..." + accountData.address.substring(accountData.address.length - 5, accountData.address.length) : "Connect"}
                 </Button>
